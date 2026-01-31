@@ -1,22 +1,12 @@
-#include <iostream>
-#include <fstream>
+#include "include/Canvas.h"
 
 int main() {
-    std::ofstream file("output.ppm");
-
-    if (!file.is_open()) {
-        std::cerr << "Unable to open file" << std::endl;
-        return 1;
-    }
-    file << "P3\n" << "256 256\n" << "255\n";
-
-    int b = 63;
-    for (int y = 0; y < 256; y++) {
-        for (int x = 0; x < 256; x++) {
-            int r = (256-x); int g = y;
-            file << r << ' ' << g << ' ' << b << '\n';
+    Canvas cv(256, 256);
+    for (int i = 0; i < 256; i++) {
+        for (int j = 0; j < 256; j++) {
+            cv.set_pixel(i, j, Vec3((float)i/255.f, (float)j/255.f, 0.0f));
         }
     }
-
+    cv.save_ppm("output.ppm");
     return 0;
 }
