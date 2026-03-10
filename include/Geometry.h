@@ -6,8 +6,13 @@
 #define TOYENGINE_GEOMETRY_H
 
 struct Vec3 {
-    float x, y, z;
-    Vec3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
+    double x, y, z;
+    Vec3(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {}
+    Vec3 operator+(const Vec3& v) const {return Vec3(x + v.x, y + v.y, z + v.z);}
+    Vec3 operator-(const Vec3& v) const {return Vec3(x - v.x, y - v.y, z - v.z);}
+    Vec3 operator*(const Vec3& v) const {return Vec3(x * v.x, y * v.y, z * v.z);}
+    Vec3 operator*(const double& s) const {return Vec3(x * s, y * s, z * s);}
+    Vec3 operator/(const double& s) const {return Vec3(x / s, y / s, z / s);}
 };
 
 struct Vec2i {
