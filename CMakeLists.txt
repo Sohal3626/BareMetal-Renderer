@@ -9,4 +9,5 @@ add_executable(toyEngine main.cpp
         include/Renderer.h
         src/Canvas.cpp
         src/Renderer.cpp
+        include/Model.h
 )

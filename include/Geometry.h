@@ -18,7 +18,7 @@ struct Vec3 {
 struct Vec2i {
     int x, y;
     Vec2i() : x(0), y(0) {}
-    Vec2i(int _x = 0, int _y = 0) : x(_x), y(_y) {}
+    Vec2i(int _x, int _y) : x(_x), y(_y) {}
 };
 
 using Color = Vec3;

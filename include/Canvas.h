@@ -16,6 +16,8 @@ public:
     Canvas(int w, int h) : width(w), height(h), pixels(w * h) {}
     void set_pixel(int x, int y, const Vec3& color);
     void save_ppm(const std::string& filename);
+    int getWidth() const { return width; }
+    int getHeight() const { return height; }
 };
 
 #endif //TOYENGINE_CANVAS_H
