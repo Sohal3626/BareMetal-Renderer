@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../include/Canvas.h"
 #include "../include/Renderer.h"
+#include <algorithm>
 
 #include <math.h>
 
@@ -54,55 +55,31 @@ void Renderer::draw_horizontal_line(Canvas& cv, int x1, int x2, int y, Color c1,
     }
 }
 
-void Renderer::fill_triangle(Canvas& canvas, Vec2i p0, Vec2i p1, Vec2i p2, Color c0, Color c1, Color c2){
-    if (p0.y > p1.y) {
-        swap(p0, p1);
-        swap(c0, c1);
-    }
-    if (p1.y > p2.y) {
-        swap(p1, p2);
-        swap(c1, c2);
-    }
-    if (p0.y > p1.y) {
-        swap(p0, p1);
-        swap(c0, c1);
-    }
+void Renderer::fill_triangle(Canvas& canvas, Vec2i p0, Vec2i p1, Vec2i p2, Color c0, Color c1, Color c2) {
+    int minX = min({p0.x, p1.x, p2.x});
+    int minY = min({p0.y, p1.y, p2.y});
+    int maxX = max({p0.x, p1.x, p2.x});
+    int maxY = max({p0.y, p1.y, p2.y});
 
-    if (p0.y == p2.y) return;
+    minX = max(0, minX);
+    minY = max(0, minY);
+    maxX = min(canvas.getWidth() - 1, maxX);
+    maxY = min(canvas.getHeight() - 1, maxY);
 
-    for (int y = p0.y; y < p1.y; y++) {
-        double t_short = (double)(y - p0.y) / (p1.y - p0.y + 1e-6);
-        double t_long = (double)(y - p0.y) / (p2.y - p0.y + 1e-6);
+    for (int x = minX; x <= maxX; x++) {
+        for (int y = minY; y <= maxY; y++) {
+            Vec2i p[3] = {p0, p1, p2};
+            Vec3 bc = barycentric(p, Vec2i(x, y));
 
-        int x_size1 = p0.x + ((p1.x - p0.x) * t_short);
-        int x_size2 = p0.x + ((p2.x - p0.x) * t_long);
+            if (bc.x < 0 || bc.y < 0 || bc.z < 0) continue;
 
-        Color c_short = c0 + (c1 - c0) * t_short;
-        Color c_long = c0 + (c2 - c0) * t_long;
+            if (bc.x >= 0 && bc.y >= 0 && bc.z >= 0) {
+                double r = c0.x * bc.x + c1.x * bc.y + c2.x * bc.z;
+                double g = c0.y * bc.x + c1.y * bc.y + c2.y * bc.z;
+                double b = c0.z * bc.x + c1.z * bc.y + c2.z * bc.z;
 
-        if (x_size1 > x_size2) {
-            swap(x_size1, x_size2);
-            swap(c_short, c_long);
+                canvas.set_pixel(x, y, Color(r, g, b));
+            }
         }
-
-        draw_horizontal_line(canvas, x_size1, x_size2, y, c_short, c_long);
-    }
-
-    for (int y = p1.y; y <= p2.y; y++) {
-        double t_short = (double)(y - p1.y) / (p2.y - p1.y + 1e-6);
-        double t_long = (double)(y - p0.y) / (p2.y - p0.y + 1e-6);
-
-        int x_size1 = p1.x + ((p2.x - p1.x) * t_short);
-        int x_size2 = p0.x + ((p2.x - p0.x) * t_long);
-
-        Color c_short = c1 + (c2 - c1) * t_short;
-        Color c_long = c0 + (c2 - c0) * t_long;
-
-        if (x_size1 > x_size2) {
-            swap(x_size1, x_size2);
-            swap(c_short, c_long);
-        }
-
-        draw_horizontal_line(canvas, x_size1, x_size2, y, c_short, c_long);
     }
 }
