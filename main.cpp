@@ -10,8 +10,8 @@ int main() {
     Canvas cv(1920, 1080);
     Canvas cv2(1920, 1080);
 
-    Model md("D:/coding/toyEngine/3Dobjects/african_head.obj");
-    Model md2("D:/coding/toyEngine/3Dobjects/Miyu.obj");
+    //Model md("D:/coding/toyEngine/3Dobjects/african_head.obj");
+    //Model md2("D:/coding/toyEngine/3Dobjects/Miyu.obj");
     //md = md2;
 
     int x0 = 900;
