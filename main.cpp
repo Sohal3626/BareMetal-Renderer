@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 
 #include "include/Canvas.h"
 #include "include/Renderer.h"
@@ -28,7 +29,7 @@ int main() {
 
     //Renderer::draw_line(cv, 200, 5, 900, 900, Color(0, 0, 1));
 
-    Renderer::fill_triangle(cv, Vec2i(x0, y0), Vec2i(x1, y1), Vec2i(x2, y2), c1, c2, c3 );
+    Renderer::fill_triangle(cv, Vec3(x0, y0), Vec3(x1, y1), Vec3(x2, y2), c1, c2, c3 );
     cv.save_ppm("output.ppm");
 
 
@@ -48,6 +49,10 @@ int main() {
 
     float scale = std::max(model_width, model_height);
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
+
     // 아래는 테스트
     for (int i=0; i<md.nfaces(); i++) {
         std::vector<int> face = md.face(i);
@@ -55,20 +60,21 @@ int main() {
         int w = cv2.getWidth();
         int h = cv2.getHeight();
 
-        Vec2i pts[3];
+        Vec3 pts[3];
 
         for (int j=0; j<3; j++) {
             Vec3 v = md.vert(face[j]);
 
             // 전체 화면 중앙에 배치하기 위한 오프셋(Margin) 계산
             // (v.x - min_x) / scale 은 0~1 사이의 값이 나옵니다.
-            int sx = ((v.x - min_x) / scale) * (w - 1);
+            int sx = (int)(((v.x - min_x) / scale) * (w - 1));
+            int sy = (int)((1.0 - (v.y - min_y) / scale) * (h - 1));
 
-            // y축은 (v.y - min_y) / scale 로 계산하고 상하반전
-            int sy = (1.0f - (v.y - min_y) / scale) * (h - 1);
 
-            pts[j] = Vec2i(sx, sy);
+            pts[j] = Vec3(sx, sy, v.z);
         }
+
+        Color c1(dis(gen), dis(gen), dis(gen));
 
         Renderer::fill_triangle(cv2, pts[0], pts[1], pts[2], c1, c2, c3 );
         /*

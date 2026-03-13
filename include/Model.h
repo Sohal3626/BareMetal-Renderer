@@ -35,7 +35,6 @@ public:
                 int itrash, idx;
                 iss >> trash;
                 while (iss >> idx >> trash >> itrash >> trash >> itrash) {
-                    idx--;
                     f.push_back(idx-1);
                 }
                 faces_.push_back(f);

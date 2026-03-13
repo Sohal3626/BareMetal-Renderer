@@ -8,9 +8,12 @@
 
 using namespace std;
 
-void Canvas::set_pixel(int x, int y, const Vec3 &color) {
+void Canvas::set_pixel(int x, int y, const Vec3 &color, double z) {
     if (x < 0 || x >= width || y < 0 || y >= height) return;
-    pixels[y * width + x] = color;
+    if (int idx = x + y * width; zbuffer[idx] < z) {
+        zbuffer[idx] = z;
+        pixels[idx] = color;
+    }
 }
 
 void Canvas::save_ppm(const std::string &filename) {

@@ -6,8 +6,6 @@
 #include "../include/Renderer.h"
 #include <algorithm>
 
-#include <math.h>
-
 using namespace std;
 
 void Renderer::draw_line(Canvas& canvas, int x0, int y0, int x1, int y1, Color color) {
@@ -55,11 +53,11 @@ void Renderer::draw_horizontal_line(Canvas& cv, int x1, int x2, int y, Color c1,
     }
 }
 
-void Renderer::fill_triangle(Canvas& canvas, Vec2i p0, Vec2i p1, Vec2i p2, Color c0, Color c1, Color c2) {
-    int minX = min({p0.x, p1.x, p2.x});
-    int minY = min({p0.y, p1.y, p2.y});
-    int maxX = max({p0.x, p1.x, p2.x});
-    int maxY = max({p0.y, p1.y, p2.y});
+void Renderer::fill_triangle(Canvas& canvas, Vec3 p0, Vec3 p1, Vec3 p2, Color c0, Color c1, Color c2) {
+    int minX = (int)floor(min({p0.x, p1.x, p2.x}));
+    int minY = (int)floor(min({p0.y, p1.y, p2.y}));
+    int maxX = (int)floor(max({p0.x, p1.x, p2.x}));
+    int maxY = (int)floor(max({p0.y, p1.y, p2.y}));
 
     minX = max(0, minX);
     minY = max(0, minY);
@@ -68,7 +66,7 @@ void Renderer::fill_triangle(Canvas& canvas, Vec2i p0, Vec2i p1, Vec2i p2, Color
 
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            Vec2i p[3] = {p0, p1, p2};
+            Vec3 p[3] = {p0, p1, p2};
             Vec3 bc = barycentric(p, Vec2i(x, y));
 
             if (bc.x < 0 || bc.y < 0 || bc.z < 0) continue;
@@ -78,7 +76,10 @@ void Renderer::fill_triangle(Canvas& canvas, Vec2i p0, Vec2i p1, Vec2i p2, Color
                 double g = c0.y * bc.x + c1.y * bc.y + c2.y * bc.z;
                 double b = c0.z * bc.x + c1.z * bc.y + c2.z * bc.z;
 
-                canvas.set_pixel(x, y, Color(r, g, b));
+                double z = p0.z * bc.x + p1.z * bc.y + p2.z * bc.z;
+
+                //cout << z << endl;
+                canvas.set_pixel(x, y, Color(r, g, b), z);
             }
         }
     }
