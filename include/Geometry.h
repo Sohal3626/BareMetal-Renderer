@@ -28,6 +28,10 @@ static Vec3 crossV3(const Vec3& a, const Vec3& b) {
     return {a.y * b.z - a.z * b.y, -1 * (a.x * b.z) + a.z * b.x, a.x * b.y - a.y * b.x};
 }
 
+static double dotV3(const Vec3& a, const Vec3& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
 static Vec3 barycentric(const Vec3 *pts, const Vec2i P) {
     Vec3 vx = (Vec3(pts[1].x - pts[0].x, pts[2].x - pts[0].x, pts[0].x - P.x));
     Vec3 vy = (Vec3(pts[1].y - pts[0].y, pts[2].y - pts[0].y, pts[0].y - P.y));
