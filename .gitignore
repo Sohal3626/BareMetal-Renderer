@@ -1,0 +1,8 @@
+# CLion/IntelliJ project files
+.idea/
+cmake-build-debug/
+cmake-build-release/
+*.user
+*.ppm
+*.obj
+3Dobjects/
