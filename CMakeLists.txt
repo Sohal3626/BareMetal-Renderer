@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 4.0)
 project(toyEngine)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -18,11 +17,3 @@ add_executable(toyEngine main.cpp
         include/RenderData.h
         src/RenderData.cpp
 )
-=======
-cmake_minimum_required(VERSION 4.0)
-project(myRenderer)
-
-set(CMAKE_CXX_STANDARD 20)
-
-add_executable(myRenderer main.cpp)
->>>>>>> c3bc670 (trash)
