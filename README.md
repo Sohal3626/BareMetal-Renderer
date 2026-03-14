@@ -25,7 +25,7 @@
       barycentric 좌표를 계산하여 삼각형 안에 있는 픽셀만 색칠하는 식으로 바뀌었다. 현대 그래픽스에서는 barycentric을 통해 픽셀을 칠한다는데 이건 CPU렌더러라 스캔라인 방식으로 색칠하는게 더 빠른거같다.
       하지만 아쉽게도 스캔라인 방식은 내가 ^문화대혁명^ 해 버리는 바람에 지금은 볼 수 없다.
 
-- `draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double caamera_z, double angleX, double angleY, double angleZ)`
+- `draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double caamera_z, double angleX, double angleY, double angleZ)`  
       모델을 캔버스에 그리는 역할이다. `model`에 파싱되어있는 선, 면 데이터를 가져와서 `fill_triangle()`을 통해 삼각형을 한 땀 한 땀 색칠해준다. 광원 방향에 따른 광량 계산, 카메라로 바라보는 방향으로 점 이동과 같은 과정이 모두
       이 함수 안에서 일어난다. 법선 벡터와 광원 벡터의 내적을 통한 밝기 계산과 선형변환 딸깍으로 점 위치 이동 같은 수학적으로 아름다운 것들은 다 들어갔지만 나는 빡대가리라 아직 이 아름다움 ㅈ도 못느끼겠어서 그냥 회전 변환 행렬을 외워버렸다.
       참고로 `angleX, angleY, angleZ`는 dgree가 아닌 radian으로 입력해야한다. ~~TMI를 좀 풀자면 학교 수치해석 시험에서 학생들이 전자계산기 사용법을 몰라 Radian을 Degree에 두고 계산하여 다같이 점수가 나락간 일이 있었는데
