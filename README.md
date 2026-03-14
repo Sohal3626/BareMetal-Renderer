@@ -82,9 +82,26 @@
 - `barycentric(Vec<3>* pts, Vec<2> p)`
   삼각형의 세 꼭짓점과 화면 상의 점 하나를 입력하면 이를 삼각형 내의 barycentric 좌표로 변환하여 리턴해준다. 
 
+## Canvas.h
+그림을 그릴 캔버스를 관리하는 클래스이다. 멤버 변수로는 캔버스의 크기를 저장하는 `width`, `height`, 캔버스의 셀들을 저장하는 `std::vector`인 `pixcels`, 셀들의 z좌표를 저장는 `double`형 `std::vector`인 `zbuffer`가 있다.
 
+- `Canvas(int w, int h)`  
+      캔버스의 생성자이다. 기본생성자랑 복사생성자는 만들기 귀찮아서 이거 하나가 다다. `w`와 `h`를 저장하고 `pixels`의 크기를 w*h로, 기본값은 검정색인 `{0, 0, 0}`로 초기화하며,
+        `zbuffer`또한 w\*h크기, 기본값은 double의 최소값으로 초기화한다.
 
+- `set_pixel(int x, int y, const Color& color, double z)`  
+        캔버스에서 2D배열 기준으로 x행, y열에 위치한 점을 `color`색상으로 세팅한다. `pixcels`는 1차원 배열이기 떄문에 x와 y는 1차원 배열 기준의 인덱스로 변환되어 동작한다.
+        Z-Buffer가 적용되어 새로 그릴 셀의 Z좌표인 `z`가 `zbuffer`의 해당 인덱스값보다 클 경우에만 픽셀을 칠해준다. 더 작을 경우에는 기록말살돼서 스탈린이랑 찍은 사진에서 삭제당한 예조프마냥 없던 것 처럼 된다.
 
+- `save_ppm(const std::string& filenaame)`
+        지금까지 캔버스에 고생해서 그린 그림을 ppm 파일에 옮겨적어준다. 나는 ppm이라는 포맷의 존재조차 모르다가 이거 하면서 처음 알게됐다.
+        참고로 ppm에서 픽셀의 색상 rgb값은 0부터 255사이의 실수로 나타나는데 이 프로그램에서는 색깔을 0부터 1사이의 실수로 표현하고 있다. $[0, 1]$ 포맷을 $[0, 255]$ 포맷으로 바꿔주는 역할을 이 `save_ppm()`이 맡는다.
+
+- `getWidth()`
+        캔버스의 너비를 리턴하는 getter다.
+
+- `getHeight()`
+        캔버스의 높이를 리턴하는 getter다.
 
 
 
