@@ -28,8 +28,8 @@ int main() {
 
     Renderer::fill_triangle(cv, Vec<3>{x0, y0, 0.}, Vec<3>{x1, y1, 0.}, Vec<3>{x2, y2, 0},
         c1, c2, c3);
-    Renderer::draw_model(cv2, md, {1, -1, -1}, 3.0);
-    //Renderer::draw_model(cv3, md2, {1, -1, -1}, 3.0);
+    Renderer::draw_model(cv2, md, {0, 0, -1}, 3.0, 0.0, 0.0);
+    //Renderer::draw_model(cv3, md2, {0, 0, -1}, 3.0, 0.0, 0.0);
 
     cv.save_ppm("output.ppm");
     cv2.save_ppm("output2.ppm");

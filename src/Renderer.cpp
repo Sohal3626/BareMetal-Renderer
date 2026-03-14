@@ -82,7 +82,9 @@ void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2, Co
     }
 }
 
-void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double camera_z) {
+void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir,
+        double camera_z, double angleX, double angleY, double angleZ) {
+
     Matrix44 projection;
     projection.m[14] = -1.0 / camera_z;
 
@@ -99,6 +101,24 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double
     }
     float p_scale = std::max(p_max_x - p_min_x, p_max_y - p_min_y);
 
+    Matrix44 rotationY;
+    rotationY.m[0] = cos(angleY);
+    rotationY.m[2] = sin(angleY);
+    rotationY.idx(2, 0) = -sin(angleY);
+    rotationY.idx(2, 2) = cos(angleY);
+
+    Matrix44 rotationX;
+    rotationX.idx(1, 1) =  cos(angleX);
+    rotationX.idx(1, 2) = -sin(angleX);
+    rotationX.idx(2, 1) =  sin(angleX);
+    rotationX.idx(2, 2) =  cos(angleX);
+
+    Matrix44 rotationZ;
+    rotationZ.m[0] = cos(angleZ);
+    rotationZ.m[1] = -sin(angleZ);
+    rotationZ.idx(1, 0) = sin(angleZ);
+    rotationZ.idx(1, 1) = cos(angleZ);
+
     int w = canvas.getWidth();
     int h = canvas.getHeight();
 
@@ -109,10 +129,13 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double
 
         for (int j=0; j<3; j++) {
             Vec<3> v = model.vert(face[j]);
-            world[j] = v;
 
             Vec<4> v4 = {v[0], v[1], v[2], 1.};
-            Vec<3> pv = projection.perspective(v4);
+            Vec<4> rv = rotationY * v4;
+            rv = rotationX * rv;
+            rv = rotationZ * rv;
+            world[j] = {rv[0], rv[1], rv[2]};
+            Vec<3> pv = projection.perspective(rv);
 
             double sx = (int)(((pv[0] - p_min_x) / p_scale) * (w - 1));
             double sy = (int)((1.0 - (pv[1] - p_min_y) / p_scale) * (h - 1));
@@ -130,7 +153,7 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double
             sqrt(light_dir[0] * light_dir[0] + light_dir[1] * light_dir[1] + light_dir[2] * light_dir[2]);
         light_dir = light_dir / light_norm;
         double intensity = dotV3(cEdge, light_dir);
-        if (intensity < 0) continue; //intensity = abs(intensity);
+        if (intensity < 0) intensity = abs(intensity);
 
         Color c = {intensity, intensity, intensity};
         Renderer::fill_triangle(canvas, screen[0], screen[1], screen[2], c, c, c);

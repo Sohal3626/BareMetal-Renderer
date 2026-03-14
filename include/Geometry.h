@@ -49,7 +49,7 @@ struct Matrix44 {
         m[0] = m[5] = m[10] = m[15] = 1.;
     }
 
-    double idx(const int i, const int j) {
+    double& idx(const int i, const int j) {
         return m[i * 4 + j];
     }
 
