@@ -57,7 +57,7 @@
 
 - 이 구조체의 N = 3인 버전은 `Color`와 `Point`라는 별칭으로 사용되고 있다. 참고로 위 Renderer.h 설명을 읽어봤다면 알겠지만 Point는 만들어놓고 다 Vec<3>로 선언해서 쓰고있는 상태다. 다시 말해 있으나마나다.
 
-### Matrix44 
+### `Matrix44`  
 이 구조체는 `double` 타입 4×4 행렬을 저장한다. 멤버로는 `double`타입 `std::vector m`이 있다.
 - Matrix44()  
     이 구조체는 기본 생성자만 지원한다. 기본 생성자는 이 행렬을 identity matrix형태로 초기화한다.
@@ -85,29 +85,29 @@
 ## Canvas.h
 그림을 그릴 캔버스를 관리하는 클래스이다. 멤버 변수로는 캔버스의 크기를 저장하는 `width`, `height`, 캔버스의 셀들을 저장하는 `std::vector`인 `pixels`, 셀들의 z좌표를 저장하는 `double`형 `std::vector`인 `zbuffer`가 있다.
 
-- `Canvas(int w, int h)`  
+- `Canvas(int w, int h)`   
       캔버스의 생성자이다. 기본생성자랑 복사생성자는 만들기 귀찮아서 이거 하나가 다다. `w`와 `h`를 저장하고 `pixels`의 크기를 w*h로, 기본값은 검정색인 `{0, 0, 0}`로 초기화하며,
         `zbuffer`또한 w\*h크기, 기본값은 double의 최소값으로 초기화한다.
 
-- `set_pixel(int x, int y, const Color& color, double z)`  
+- `set_pixel(int x, int y, const Color& color, double z)`   
         캔버스에서 2D배열 기준으로 x행, y열에 위치한 점을 `color`색상으로 세팅한다. `pixels`는 1차원 배열이기 떄문에 x와 y는 1차원 배열 기준의 인덱스로 변환되어 동작한다.
         Z-Buffer가 적용되어 새로 그릴 셀의 Z좌표인 `z`가 `zbuffer`의 해당 인덱스값보다 클 경우에만 픽셀을 칠해준다. 더 작을 경우에는 기록말살 당한다. 마치 스탈린이랑 찍은 사진에서 삭제당한 예조프처럼 말이다.
 
-- `save_ppm(const std::string& filename)`  
+- `save_ppm(const std::string& filename)`   
         지금까지 캔버스에 고생해서 그린 그림을 ppm 파일에 옮겨적어준다. 나는 ppm이라는 포맷의 존재조차 모르다가 이거 하면서 처음 알게됐다.
         참고로 ppm에서 픽셀의 색상 rgb값은 0부터 255사이의 실수로 나타나는데 이 프로그램에서는 색깔을 0부터 1사이의 실수로 표현하고 있다. $[0, 1]$ 포맷을 $[0, 255]$ 포맷으로 바꿔주는 역할을 이 `save_ppm()`이 맡는다.
 
-- `getWidth()`  
+- `getWidth()`   
         캔버스의 너비를 리턴하는 getter다.
 
-- `getHeight()`  
+- `getHeight()`   
         캔버스의 높이를 리턴하는 getter다.
 
 ## Model.h
 `.obj` 타입의 모델링 데이터를 가져와서 파싱하고, 저장하는 클래스이다. 멤버로는 정점들을 저장하는 `std::vector<Vec3>> verts_`와 면들을 저장하는 `std::vector<std::vector<int>> faces_`가 있다.  
 나는 스트림 파싱을 ㅈㄴ 못하기 때문에 이게 제일 어려웠다. ㅅㅂ
 
-- `Model(const char* filename)`  
+- `Model(const char* filename)`   
         이 클래스의 유일한 생성자이자 모든 것 이다. `filename`경로를  타고 따라가 모델링을 읽어 멤버 변수에 저장한다. 
         나는 obj파일의 내용을 처음 읽어봐서 굉장히 신기했다. obj파일 안에는 정점들을 `v 0.1557, -0.1557, 0.1557`과 같은 식으로 줄마다 써놓는다.
         그리고 좀 내려보면 `f 1557/1557/1557 1557/1557/1557 1557/1557/1557`처럼 생긴 줄이 있는데 이는 정점들을 이어서 만든 삼각형 면, 즉 폴리곤을 의미한다.
