@@ -97,8 +97,8 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double
         if (v[1] < p_min_y) p_min_y = v[1];
         if (v[1] > p_max_y) p_max_y = v[1];
     }
-
     float p_scale = std::max(p_max_x - p_min_x, p_max_y - p_min_y);
+
     int w = canvas.getWidth();
     int h = canvas.getHeight();
 
@@ -126,8 +126,11 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double
         double norm = sqrt(cEdge[0] * cEdge[0] + cEdge[1] * cEdge[1] + cEdge[2] * cEdge[2]);
         if (norm > 0) cEdge = cEdge / norm;
 
+        double light_norm =
+            sqrt(light_dir[0] * light_dir[0] + light_dir[1] * light_dir[1] + light_dir[2] * light_dir[2]);
+        light_dir = light_dir / light_norm;
         double intensity = dotV3(cEdge, light_dir);
-        if (intensity < 0) intensity = abs(intensity);
+        if (intensity < 0) continue; //intensity = abs(intensity);
 
         Color c = {intensity, intensity, intensity};
         Renderer::fill_triangle(canvas, screen[0], screen[1], screen[2], c, c, c);
