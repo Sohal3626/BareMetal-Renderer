@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by desktop on 26. 1. 31..
 //
@@ -5,41 +7,81 @@
 #ifndef TOYENGINE_GEOMETRY_H
 #define TOYENGINE_GEOMETRY_H
 
-struct Vec3 {
-    double x, y, z;
-    Vec3(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {}
-    Vec3 operator+(const Vec3& v) const {return {x + v.x, y + v.y, z + v.z};}
-    Vec3 operator-(const Vec3& v) const {return {x - v.x, y - v.y, z - v.z};}
-    Vec3 operator*(const Vec3& v) const {return {x * v.x, y * v.y, z * v.z};}
-    Vec3 operator*(const double& s) const {return {x * s, y * s, z * s};}
-    Vec3 operator/(const double& s) const {return {x / s, y / s, z / s};}
+template <int N>
+struct Vec {
+    std::vector<double> data;
+    Vec() : data(N) {for ( int i=0; i<N; i++) data[i] = 0;}
+    Vec(std::vector<double> v) : data(std::move(v)) {};
+    Vec(std::initializer_list<double> v) : data(N) {
+        auto it  = v.begin();
+        for (int i=0; i<N && it != v.end(); ++i, ++it) data[i] = *it;
+    };
+
+    Vec<N> operator+(const Vec<N>& v) const {
+        Vec<N> r;
+        for ( int i=0; i<N; i++) r.data[i] = data[i] + v.data[i];
+        return r;
+    }
+    Vec<N> operator-(const Vec<N>& v) const {
+        Vec<N> r;
+        for ( int i=0; i<N; i++) r.data[i] = data[i] - v.data[i];
+        return r;
+    }
+    Vec<N> operator*(const double& s) const {
+        Vec<N> r;
+        for ( int i=0; i<N; i++) r.data[i] = data[i] * s;
+        return r;
+    }
+    Vec<N> operator/(const double& s) const {
+        Vec<N> r;
+        for ( int i=0; i<N; i++) r.data[i] = data[i] / s;
+        return r;
+    }
+    double& operator[](const int i) { return data[i]; }
 };
 
-struct Vec2i {
-    int x, y;
-    Vec2i() : x(0), y(0) {}
-    Vec2i(const int _x, const int _y) : x(_x), y(_y) {}
+struct Matrix44 {
+    std::vector<double> m;
+    Matrix44() : m(16) {
+        for (int i=0; i<16; i++) {
+                m[i] = 0.;
+            }
+        m[0] = m[5] = m[10] = m[15] = 1.;
+    }
+
+    double idx(const int i, const int j) {
+        return m[i * 4 + j];
+    }
+
+    Vec<3> operator*(Vec<4>& v) {
+        double res[4];
+        for (int i=0; i<4; i++) {
+            res[i] = idx(i, 0) * v[0] + idx(i, 1) * v[1] + idx(i, 2) * v[2] + idx(i, 3) * v[3];
+        }
+        if (std::abs(res[3]) > 1e-9) return { res[0]/res[3], res[1]/res[3], res[2]/res[3] };
+        return {res[0], res[1], res[2]};
+    }
 };
 
-using Color = Vec3;
-using Point = Vec3;
+using Color = Vec<3>;
+using Point = Vec<3>;
 
-static Vec3 crossV3(const Vec3& a, const Vec3& b) {
-    return {a.y * b.z - a.z * b.y, -1 * (a.x * b.z) + a.z * b.x, a.x * b.y - a.y * b.x};
+static Vec<3> crossV3(Vec<3> &a, Vec<3> b) {
+    return {a[1] * b[2] - a[2] * b[1], -1 * (a[0] * b[2]) + a[2] * b[0], a[0] * b[1] - a[1] * b[0]};
 }
 
-static double dotV3(const Vec3& a, const Vec3& b) {
-    return a.x * b.x + a.y * b.y + a.z * b.z;
+static double dotV3(Vec<3>& a, Vec<3>& b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
-static Vec3 barycentric(const Vec3 *pts, const Vec2i P) {
-    Vec3 vx = (Vec3(pts[1].x - pts[0].x, pts[2].x - pts[0].x, pts[0].x - P.x));
-    Vec3 vy = (Vec3(pts[1].y - pts[0].y, pts[2].y - pts[0].y, pts[0].y - P.y));
+static Vec<3> barycentric(Vec<3> *pts, Vec<2> P) {
+    Vec<3> vx = {pts[1][0] - pts[0][0], pts[2][0] - pts[0][0], pts[0][0] - P[0]};
+    Vec<3> vy = {pts[1][1] - pts[0][1], pts[2][1] - pts[0][1], pts[0][1] - P[1]};
 
-    Vec3 u = crossV3(vx, vy);
+    Vec<3> u = crossV3(vx, vy);
 
-    double u_val = u.x / u.z;
-    double v_val = u.y / u.z;
+    double u_val = u[0] / u[2];
+    double v_val = u[1] / u[2];
 
     return {1. - (u_val + v_val), u_val, v_val};
 }

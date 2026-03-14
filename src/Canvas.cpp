@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void Canvas::set_pixel(int x, int y, const Vec3 &color, double z) {
+void Canvas::set_pixel(int x, int y, const Color &color, double z) {
     if (x < 0 || x >= width || y < 0 || y >= height) return;
     if (int idx = x + y * width; zbuffer[idx] < z) {
         zbuffer[idx] = z;
@@ -24,9 +24,9 @@ void Canvas::save_ppm(const std::string &filename) {
     }
     file << "P3\n" << width << " " << height << "\n255\n";
 
-    for (const auto& p : pixels) {
-        file << (int)(255.99 * p.x) << " "
-            << (int)(255.99 * p.y) << " "
-            << (int)(255.99 * p.z) << "\n";
+    for (Point p : pixels) {
+        file << (int)(255.99 * p[0]) << " "
+            << (int)(255.99 * p[1]) << " "
+            << (int)(255.99 * p[2]) << "\n";
     }
 }
