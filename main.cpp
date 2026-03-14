@@ -12,7 +12,6 @@ int main() {
     Canvas cv3(1920, 1080);
 
     Model md("../3Dobjects/african_head.obj");
-    //Model md2("../3Dobjects/lion.obj");
 
     double x0 = 900;
     double y0 = 20;

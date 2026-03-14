@@ -53,11 +53,16 @@ struct Matrix44 {
         return m[i * 4 + j];
     }
 
-    Vec<3> operator*(Vec<4>& v) {
+    Vec<4> operator*(Vec<4>& v) {
         double res[4];
         for (int i=0; i<4; i++) {
             res[i] = idx(i, 0) * v[0] + idx(i, 1) * v[1] + idx(i, 2) * v[2] + idx(i, 3) * v[3];
         }
+        return {res[0], res[1], res[2], res[3]};
+    }
+
+    Vec<3> perspective(Vec<4>& v) {
+        Vec<4> res = (*this) * v;
         if (std::abs(res[3]) > 1e-9) return { res[0]/res[3], res[1]/res[3], res[2]/res[3] };
         return {res[0], res[1], res[2]};
     }

@@ -112,7 +112,7 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir, double
             world[j] = v;
 
             Vec<4> v4 = {v[0], v[1], v[2], 1.};
-            Vec<3> pv = projection * v4;
+            Vec<3> pv = projection.perspective(v4);
 
             double sx = (int)(((pv[0] - p_min_x) / p_scale) * (w - 1));
             double sy = (int)((1.0 - (pv[1] - p_min_y) / p_scale) * (h - 1));
