@@ -40,9 +40,13 @@ public:
         int x = (int)(u * (width - 1));
         int y = (int)(v * (height - 1));
 
-        int idx = (y * width + x) * 3;
+        if (x < 0) x = 0; if (x >= width) x = width - 1;
+        if (y < 0) y = 0; if (y >= height) y = height - 1;
+
+        int idx = (y * width + x) * channels;
 
         Color c;
+
         // 그래서 중괄호 생성 왜안되는거임?
         c[0] = data[idx] / 255.0;
         c[1] = data[idx+1] / 255.0;

@@ -13,7 +13,8 @@ int main() {
 
     Model md("../3Dobjects/african_head.obj");
 
-    Texture tx("asdf");
+    Texture tx("../Textures/african_head.jpg");
+    Texture tx2("temp");
 
     double x0 = 900;
     double y0 = 20;
@@ -24,8 +25,8 @@ int main() {
     double x2 = 1800;
     double y2 = 990;
 
-    Renderer::draw_model(cv, md, tx, {0, 0, 1}, 3.0);
-    //Renderer::draw_model(cv1, md2, {0, 0, -1}, 3.0, 0.0, 0.0);
+    Renderer::draw_model(cv, md, tx, {0, 0, 1}, 3.0, 0.0, 1.7);
+    //Renderer::draw_model(cv1, md2, tx2, {0, 0, -1}, 3.0, 0.0, 0.0);
 
     cv.save_ppm("output1.ppm");
     cv1.save_ppm("output2.ppm");
