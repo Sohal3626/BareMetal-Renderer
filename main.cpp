@@ -12,11 +12,6 @@ int main() {
     Canvas cv2(1420, 1520);
 
     Model md("../3Dobjects/african_head.obj");
-    //Model md2("../3Dobjects/Miyu.obj");
-    //Model md2("../3Dobjects/Putin.obj");
-    //Model md2("../3Dobjects/Hoshino.obj");
-    //Model md2("../3Dobjects/octopus.obj");
-    //Model md2("../3Dobjects/lion.obj");
 
     Texture tx("asdf");
 
