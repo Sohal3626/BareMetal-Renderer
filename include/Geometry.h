@@ -8,15 +8,16 @@
 #define TOYENGINE_GEOMETRY_H
 
 template <int N>
-struct Vec {
+class Vec {
+private:
     std::vector<double> data;
+public:
     Vec() : data(N) {for ( int i=0; i<N; i++) data[i] = 0;}
     Vec(std::vector<double> v) : data(std::move(v)) {};
     Vec(std::initializer_list<double> v) : data(N) {
         auto it  = v.begin();
         for (int i=0; i<N && it != v.end(); ++i, ++it) data[i] = *it;
     };
-
     Vec<N> operator+(const Vec<N>& v) const {
         Vec<N> r;
         for ( int i=0; i<N; i++) r.data[i] = data[i] + v.data[i];
@@ -39,6 +40,9 @@ struct Vec {
     }
     double& operator[](const int i) { return data[i]; }
 };
+
+using Color = Vec<3>;
+using Point = Vec<3>;
 
 struct Matrix44 {
     std::vector<double> m;
@@ -68,8 +72,6 @@ struct Matrix44 {
     }
 };
 
-using Color = Vec<3>;
-using Point = Vec<3>;
 
 static Vec<3> crossV3(Vec<3> &a, Vec<3> b) {
     return {a[1] * b[2] - a[2] * b[1], -1 * (a[0] * b[2]) + a[2] * b[0], a[0] * b[1] - a[1] * b[0]};
@@ -79,9 +81,9 @@ static double dotV3(Vec<3>& a, Vec<3>& b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
-static Vec<3> barycentric(Vec<3> *pts, Vec<2> P) {
-    Vec<3> vx = {pts[1][0] - pts[0][0], pts[2][0] - pts[0][0], pts[0][0] - P[0]};
-    Vec<3> vy = {pts[1][1] - pts[0][1], pts[2][1] - pts[0][1], pts[0][1] - P[1]};
+static Vec<3> barycentric(Vec<3> *pts, Vec<2> p) {
+    Vec<3> vx = {pts[1][0] - pts[0][0], pts[2][0] - pts[0][0], pts[0][0] - p[0]};
+    Vec<3> vy = {pts[1][1] - pts[0][1], pts[2][1] - pts[0][1], pts[0][1] - p[1]};
 
     Vec<3> u = crossV3(vx, vy);
 

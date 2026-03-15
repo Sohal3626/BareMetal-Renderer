@@ -5,4 +5,5 @@ cmake-build-release/
 *.user
 *.ppm
 *.obj
+*.mtl
 3Dobjects/

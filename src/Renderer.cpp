@@ -1,6 +1,7 @@
 //
 // Created by desktop on 26. 1. 31..
 //
+
 #include <iostream>
 #include "../include/Canvas.h"
 #include "../include/Renderer.h"
@@ -54,7 +55,9 @@ void Renderer::draw_horizontal_line(Canvas& cv, int x1, int x2, int y, Color c1,
     }
 }
 
-void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2, Color c0, Color c1, Color c2) {
+void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
+        Texture& texture, double intensity, Vec<2>* uvs) {
+
     int minX = (int)floor(min({p0[0], p1[0], p2[0]}));
     int minY = (int)floor(min({p0[1], p1[1], p2[1]}));
     int maxX = (int)floor(max({p0[0], p1[0], p2[0]}));
@@ -72,18 +75,18 @@ void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2, Co
 
             if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0) continue;
             double z = p0[2] * bc[0] + p1[2] * bc[1] + p2[2] * bc[2];
-            double r = bc[0] * c0[0] + bc[1] * c1[0] + bc[2] * c2[0];
-            double g = bc[0] * c0[1] + bc[1] * c1[1] + bc[2] * c2[1];
-            double b = bc[0] * c0[2] + bc[1] * c1[2] + bc[2] * c2[2];
-            Color color = {r, g, b};
 
-            canvas.set_pixel(x, y, color, z);
+            double u = uvs[0][0] * bc[0] + uvs[1][0] * bc[1] + uvs[2][0] * bc[2];
+            double v = uvs[0][1] * bc[0] + uvs[1][1] * bc[1] + uvs[2][1] * bc[2];
+
+            Color color = texture.get_color(u, v);
+            canvas.set_pixel(x, y, color*intensity, z);
         }
     }
 }
 
-void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir,
-        double camera_z, double angleX, double angleY, double angleZ) {
+void Renderer::draw_model(Canvas &canvas, Model &model, Texture &texture, Vec<3> light_dir,
+                          double camera_z, double angleX, double angleY, double angleZ) {
 
     Matrix44 projection;
     projection.m[14] = -1.0 / camera_z;
@@ -123,14 +126,17 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir,
     int h = canvas.getHeight();
 
     for (int i=0; i<model.nfaces(); i++) {
-        vector<int> face = model.face(i);
+        vector<FaceVertex> face = model.face(i);
+
         Vec<3> world[3];
         Vec<3> screen[3];
+        Vec<2> uv[3];
 
         for (int j=0; j<3; j++) {
-            Vec<3> v = model.vert(face[j]);
+            world[j] = model.vert(face[j].v);
+            uv[j] = model.tex(face[j].vt);
 
-            Vec<4> v4 = {v[0], v[1], v[2], 1.};
+            Vec<4> v4 = {world[j][0], world[j][1], world[j][2], 1.};
             Vec<4> rv = rotationY * v4;
             rv = rotationX * rv;
             rv = rotationZ * rv;
@@ -156,6 +162,7 @@ void Renderer::draw_model(Canvas& canvas, Model& model, Vec<3> light_dir,
         if (intensity < 0) intensity = abs(intensity);
 
         Color c = {intensity, intensity, intensity};
-        Renderer::fill_triangle(canvas, screen[0], screen[1], screen[2], c, c, c);
+        Renderer::fill_triangle(canvas, screen[0], screen[1], screen[2],
+            texture, intensity, uv);
     }
 }

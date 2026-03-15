@@ -10,4 +10,7 @@ add_executable(toyEngine main.cpp
         src/Canvas.cpp
         src/Renderer.cpp
         include/Model.h
+        include/Texture.h
+        include/stb_image.h
+        src/stb_image_impl.cpp
 )
