@@ -181,4 +181,14 @@
 - `get_color(double u, double v)`  
     멤버 변수 `data`에 들어있는 이미지 상에서 `u`, `v`좌표에 있는 픽셀을 가져온다. 이미지 데이터에서는 픽셀 하나당
     인덱스 3개를 사용하면서 R G B R G B 순서로 데이터가 나열되어 있는데 이 색상값을 뽑아오기 위한 좌표 변환이 들어가 있다.
+
+---
+# 기타 사항
+## Third-party library
+- stb_img.h
+  url : https://github.com/nothings/stb/blob/master/stb_image.h
+
+## Reference
+- Tiny renderer
+  url : https://github.com/ssloy/tinyrenderer 
     
