@@ -6,6 +6,43 @@
 그냥 제미나이한테 공부하고 싶다 하면 로드맵을 알아서 찾아와서 나한테 강의까지 해준다.
 이 프로젝트의 목적은 렌더링의 기본적인 파이프라인을 공부하기 위해 AI의 도움을 받아 Tiny Renderer 스타일의 튜토리얼을 진행하는 것이다.
 
+## 파일 구조
+```
+BareMetal-Render/
+│
+├── include/
+│   ├── Canvas.h
+│   ├── Geometry.h
+│   ├── Model.h
+│   ├── Renderer.h
+│   ├── Texture.h
+│   └── stb_image.h (Third-Party)
+├── src/
+│   ├── Canvas.cpp
+│   ├── Renderer.cpp
+│   └── std_image_impl.cpp (Third-Party)
+├── main.cpp
+├── .gitignore
+└── README.md
+```
+
+## 현재 진행
+
+### 완성한 것들
+- 캔버스 저장
+- 브레젠험을 통한 선 긋기
+- 삼각형 그리기
+- 모델 파싱
+- 모델 래스터라이징
+- 플랫 셰이딩
+- 단일 텍스쳐 매핑
+
+### 앞으로 할것들
+ - mtl파싱을 통한 여러 텍스쳐 매핑
+ - 보간을 이용한 좀 더 개지리리는 셰이딩
+ - mtl 파싱을 통한 질감 구현
+ - 그 밖에 내가 모르는 ㅈ같은 것들
+
 ---
 # 주요 구현 기능
 
