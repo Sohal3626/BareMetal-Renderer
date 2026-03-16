@@ -185,10 +185,10 @@
 ---
 # 기타 사항
 ## Third-party library
-- stb_img.h
+- stb_img.h  
   url : https://github.com/nothings/stb/blob/master/stb_image.h
 
 ## Reference
-- Tiny renderer
+- Tiny renderer  
   url : https://github.com/ssloy/tinyrenderer 
     
