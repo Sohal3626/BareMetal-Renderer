@@ -1,11 +1,12 @@
-#include <utility>
-
 //
 // Created by desktop on 26. 1. 31..
 //
 
 #ifndef TOYENGINE_GEOMETRY_H
 #define TOYENGINE_GEOMETRY_H
+#include <utility>
+#include <initializer_list>
+#include <vector>
 
 template <int N>
 class Vec {

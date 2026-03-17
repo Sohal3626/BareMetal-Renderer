@@ -28,12 +28,9 @@ public:
     }
 
     Color get_color(double u, double v) {
+        Color c;
         if (!data) {
-            // 아니 시발 왜 중괄호 생성이 안되는거야 ㅅㅂ
-            Color c;
-            c[0] = 1.0;
-            c[1] = 0.0;
-            c[2] = 1.0;
+            c = {1.0, 0.0, 1.0};
             return c;
         }
 
@@ -44,13 +41,7 @@ public:
         if (y < 0) y = 0; if (y >= height) y = height - 1;
 
         int idx = (y * width + x) * channels;
-
-        Color c;
-
-        // 그래서 중괄호 생성 왜안되는거임?
-        c[0] = data[idx] / 255.0;
-        c[1] = data[idx+1] / 255.0;
-        c[2] = data[idx+2] / 255.0;
+        c = {data[idx] / 255.0, data[idx+1] / 255.0, data[idx+2] / 255.0};
         return c;
     }
 };
