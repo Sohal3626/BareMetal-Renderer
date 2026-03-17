@@ -14,4 +14,6 @@ add_executable(toyEngine main.cpp
         include/stb_image.h
         src/stb_image_impl.cpp
         include/Material.h
+        include/RenderData.h
+        src/RenderData.cpp
 )

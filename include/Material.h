@@ -12,8 +12,8 @@
 #include "Geometry.h"
 
 struct MaterialData {
-    std::string mtlname = "default";
-    std::string map_kd = "";
+    std::string mtlname;
+    std::string map_kd;
     double ns = 0.0;
     Vec<3> ka = {0, 0, 0};
     Vec<3> kd = {0, 0, 0};
@@ -78,13 +78,12 @@ public:
         }
         mmap = map;
     }
-    MaterialData getMaterial(const std::string& mtlname) {
-        if (mmap.contains(mtlname)) {
-            return mmap[mtlname];
-        }else {
-            std::cerr << "Missing file" << mtlname << std::endl;
-            return {};
+    MaterialData getMaterial(const std::string& mtlname) const {
+        auto it = mmap.find(mtlname);
+        if (it != mmap.end()) {
+            return it->second;
         }
+        return {};
     }
 private:
     std::map<std::string, MaterialData> mmap;

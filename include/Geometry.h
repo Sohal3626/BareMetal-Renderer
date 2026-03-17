@@ -58,7 +58,11 @@ struct Matrix44 {
         return m[i * 4 + j];
     }
 
-    Vec<4> operator*(Vec<4>& v) {
+    double idx(const int i, const int j) const {
+        return m[i * 4 + j];
+    }
+
+    Vec<4> operator*(Vec<4>& v) const {
         double res[4];
         for (int i=0; i<4; i++) {
             res[i] = idx(i, 0) * v[0] + idx(i, 1) * v[1] + idx(i, 2) * v[2] + idx(i, 3) * v[3];
@@ -66,7 +70,20 @@ struct Matrix44 {
         return {res[0], res[1], res[2], res[3]};
     }
 
-    Vec<3> perspective(Vec<4>& v) {
+    Matrix44 operator*(const Matrix44& b) const {
+        Matrix44 res;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                res.idx(i, j) = 0;
+                for (int k = 0; k < 4; k++) {
+                    res.idx(i, j) += this->idx(i, k) * b.idx(k, j);
+                }
+            }
+        }
+        return res;
+    }
+
+    Vec<3> perspective(Vec<4>& v) const {
         Vec<4> res = (*this) * v;
         if (std::abs(res[3]) > 1e-9) return { res[0]/res[3], res[1]/res[3], res[2]/res[3] };
         return {res[0], res[1], res[2]};

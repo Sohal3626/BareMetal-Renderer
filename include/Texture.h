@@ -15,8 +15,12 @@ public:
     unsigned char* data;
 
     Texture(const char* filename) : width(0), height(0), channels(0), data(NULL) {
+        if (!filename || std::string(filename).empty()) {
+            std::cerr << "Warning: Texture filename is empty!" << std::endl;
+            return;
+        }
         stbi_set_flip_vertically_on_load(true);
-        data = stbi_load(filename, &width, &height, &channels, 3);
+        data = stbi_load(filename, &width, &height, &channels, 0);
 
         if (!data) {
             std::cerr << "Missing file -> " << filename << std::endl;
@@ -27,7 +31,7 @@ public:
         if (data) stbi_image_free(data);
     }
 
-    Color get_color(double u, double v) {
+    Color get_color(double u, double v) const {
         Color c;
         if (!data) {
             c = {1.0, 0.0, 1.0};

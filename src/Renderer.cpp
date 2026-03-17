@@ -5,6 +5,7 @@
 #include <iostream>
 #include "../include/Canvas.h"
 #include "../include/Renderer.h"
+#include "../include/RenderData.h"
 #include <algorithm>
 #include <cmath>
 
@@ -73,7 +74,7 @@ void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
         for (int y = minY; y <= maxY; y++) {
             Vec<3> bc = barycentric(p, {(double)x , (double)y});
 
-            if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0) continue;
+            if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0 || isnan(bc[0]) || isnan(bc[1]) || isnan(bc[2])) continue;
             double z = p0[2] * bc[0] + p1[2] * bc[1] + p2[2] * bc[2];
 
             double u = uvs[0][0] * bc[0] + uvs[1][0] * bc[1] + uvs[2][0] * bc[2];
@@ -85,84 +86,80 @@ void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
     }
 }
 
-void Renderer::draw_model(Canvas &canvas, Model &model, Texture &texture, Vec<3> light_dir,
-                          double camera_z, double angleX, double angleY, double angleZ) {
-
-    Matrix44 projection;
-    projection.m[14] = -1.0 / camera_z;
-
-    float p_min_x = 1e10, p_max_x = -1e10;
-    float p_min_y = 1e10, p_max_y = -1e10;
-
-    for (int i=0; i<model.nverts(); i++) {
-        Vec<3> v = model.vert(i);
-
-        if (v[0] < p_min_x) p_min_x = v[0];
-        if (v[0] > p_max_x) p_max_x = v[0];
-        if (v[1] < p_min_y) p_min_y = v[1];
-        if (v[1] > p_max_y) p_max_y = v[1];
-    }
-    float p_scale = std::max(p_max_x - p_min_x, p_max_y - p_min_y);
+Matrix44 Renderer::transfrom(double p_scale, double angle_x, double angle_y, double angle_z, double camera_z) {
+    Matrix44 scale;
+    scale.idx(0,0) = 1.0/p_scale; scale.idx(1,1) = 1.0/p_scale; scale.idx(2,2) = 1.0/p_scale;
 
     Matrix44 rotationY;
-    rotationY.m[0] = cos(angleY);
-    rotationY.m[2] = sin(angleY);
-    rotationY.idx(2, 0) = -sin(angleY);
-    rotationY.idx(2, 2) = cos(angleY);
+    rotationY.m[0] = cos(angle_y);
+    rotationY.m[2] = sin(angle_y);
+    rotationY.idx(2, 0) = -sin(angle_y);
+    rotationY.idx(2, 2) = cos(angle_y);
 
     Matrix44 rotationX;
-    rotationX.idx(1, 1) =  cos(angleX);
-    rotationX.idx(1, 2) = -sin(angleX);
-    rotationX.idx(2, 1) =  sin(angleX);
-    rotationX.idx(2, 2) =  cos(angleX);
+    rotationX.idx(1, 1) =  cos(angle_x);
+    rotationX.idx(1, 2) = -sin(angle_x);
+    rotationX.idx(2, 1) =  sin(angle_x);
+    rotationX.idx(2, 2) =  cos(angle_x);
 
     Matrix44 rotationZ;
-    rotationZ.m[0] = cos(angleZ);
-    rotationZ.m[1] = -sin(angleZ);
-    rotationZ.idx(1, 0) = sin(angleZ);
-    rotationZ.idx(1, 1) = cos(angleZ);
+    rotationZ.m[0] = cos(angle_z);
+    rotationZ.m[1] = -sin(angle_z);
+    rotationZ.idx(1, 0) = sin(angle_z);
+    rotationZ.idx(1, 1) = cos(angle_z);
 
+    Matrix44 proj;
+    proj.m[14] = -1.0 / camera_z;
+
+    return proj * rotationX * rotationY * rotationZ * scale;
+}
+
+double Renderer::get_intensity(Vec<3> *pts, Vec<3> light_dir) {
+    Vec<3> edge1 = pts[2] - pts[0];
+    Vec<3> edge2 = pts[1] - pts[0];
+    Vec<3> cEdge = crossV3(edge1, edge2);
+    double norm = sqrt(cEdge[0] * cEdge[0] + cEdge[1] * cEdge[1] + cEdge[2] * cEdge[2]);
+    if (norm > 0) cEdge = cEdge / norm;
+
+    double light_norm =
+        sqrt(light_dir[0] * light_dir[0] + light_dir[1] * light_dir[1] + light_dir[2] * light_dir[2]);
+    light_dir = light_dir / light_norm;
+    double intensity = dotV3(cEdge, light_dir);
+    if (intensity < 0) return 0;
+    return intensity;
+}
+
+void Renderer::draw_model(Canvas &canvas, const vector<RenderUnit>& units,
+    const Matrix44 &transform, const Vec<3>& light_dir) {
     int w = canvas.getWidth();
     int h = canvas.getHeight();
 
-    for (int i=0; i<model.nfaces(); i++) {
-        vector<FaceVertex> face = model.face(i);
+    for (const auto& unit : units) {
+        Texture* curr_tex = unit.tex.get();
+        if (!curr_tex || !curr_tex->data) continue;
+        for (size_t i = 0; i < unit.buffer.size(); i+=24) {
+            Vec<3> screen[3];
+            Vec<2> uvs[3];
+            Vec<3> normal[3]; // vn을 이용한 플랫 쉐이딩은 나중에 구현
+            Vec<3> world[3];
+            for (int j=0; j<3; j++) {
+                int tmp = i + (j*8);
+                if (tmp + 7 >= unit.buffer.size()) break;
+                Vec<4> v4 = {unit.buffer[tmp], unit.buffer[tmp+1], unit.buffer[tmp+2], 1.};
+                uvs[j] = {unit.buffer[tmp+3], unit.buffer[tmp+4]};
+                normal[j] = {unit.buffer[tmp+5], unit.buffer[tmp+6], unit.buffer[tmp+7]};
+                Vec<4> rv = transform * v4;
+                world[j] = {rv[0], rv[1], rv[2]};
+                Vec<3> pv = transform.perspective(rv);
 
-        Vec<3> world[3];
-        Vec<3> screen[3];
-        Vec<2> uv[3];
+                double sx = (int)((pv[0] + 1.0) * 0.5 * (w - 1));
+                double sy = (int)((1.0 - (pv[1] + 1.0) * 0.5) * (h - 1));
+                screen[j] = {sx, sy, pv[2]};
+            }
+            double intensity = get_intensity(world, light_dir);
+            if (intensity <= 0) continue;
+            fill_triangle(canvas, screen[0], screen[1], screen[2], *curr_tex ,intensity, uvs);
 
-        for (int j=0; j<3; j++) {
-            world[j] = model.vert(face[j].v);
-            uv[j] = model.tex(face[j].vt);
-
-            Vec<4> v4 = {world[j][0], world[j][1], world[j][2], 1.};
-            Vec<4> rv = rotationY * v4;
-            rv = rotationX * rv;
-            rv = rotationZ * rv;
-            world[j] = {rv[0], rv[1], rv[2]};
-            Vec<3> pv = projection.perspective(rv);
-
-            double sx = (int)(((pv[0] - p_min_x) / p_scale) * (w - 1));
-            double sy = (int)((1.0 - (pv[1] - p_min_y) / p_scale) * (h - 1));
-
-            screen[j] = {sx, sy, pv[2]};
         }
-
-        Vec<3> edge1 = world[2] - world[0];
-        Vec<3> edge2 = world[1] - world[0];
-        Vec<3> cEdge = crossV3(edge1, edge2);
-        double norm = sqrt(cEdge[0] * cEdge[0] + cEdge[1] * cEdge[1] + cEdge[2] * cEdge[2]);
-        if (norm > 0) cEdge = cEdge / norm;
-
-        double light_norm =
-            sqrt(light_dir[0] * light_dir[0] + light_dir[1] * light_dir[1] + light_dir[2] * light_dir[2]);
-        light_dir = light_dir / light_norm;
-        double intensity = dotV3(cEdge, light_dir);
-        if (intensity < 0) intensity = abs(intensity);
-
-        Color c = {intensity, intensity, intensity};
-        Renderer::fill_triangle(canvas, screen[0], screen[1], screen[2],
-            texture, intensity, uv);
     }
 }

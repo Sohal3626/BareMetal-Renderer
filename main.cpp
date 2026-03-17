@@ -12,22 +12,13 @@ int main() {
     Canvas cv2(1420, 1520);
 
     Model md("../3Dobjects/african_head.obj");
+    Material mat("../3Dobjects/african_head.mtl");
+    DataBuilder db;
+    std::vector<RenderUnit> units = db.build(md, mat, "./Textures");
+    Matrix44 tp{};
 
-    Texture tx("../Textures/african_head.jpg");
-    Texture tx1("../Textures/african_head2.tga");
-    Texture tx2("temp");
+    Renderer::draw_model(cv1, units, tp);
 
-    double x0 = 900;
-    double y0 = 20;
-
-    double x1 = 500;
-    double y1 = 450;
-
-    double x2 = 1800;
-    double y2 = 990;
-
-    Renderer::draw_model(cv, md, tx1, {0, 0, 1}, 3.0, 0.0, 0.0);
-    //Renderer::draw_model(cv1, md2, tx2, {0, 0, -1}, 3.0, 0.0, 0.0);
 
     cv.save_ppm("output1.ppm");
     cv1.save_ppm("output2.ppm");
