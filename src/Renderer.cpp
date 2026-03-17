@@ -58,7 +58,6 @@ void Renderer::draw_horizontal_line(Canvas& cv, int x1, int x2, int y, Color c1,
 
 void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
         Texture& texture, double intensity, Vec<2>* uvs) {
-
     int minX = (int)floor(min({p0[0], p1[0], p2[0]}));
     int minY = (int)floor(min({p0[1], p1[1], p2[1]}));
     int maxX = (int)floor(max({p0[0], p1[0], p2[0]}));
@@ -136,7 +135,6 @@ void Renderer::draw_model(Canvas &canvas, const vector<RenderUnit>& units,
 
     for (const auto& unit : units) {
         Texture* curr_tex = unit.tex.get();
-        if (!curr_tex || !curr_tex->data) continue;
         for (size_t i = 0; i < unit.buffer.size(); i+=24) {
             Vec<3> screen[3];
             Vec<2> uvs[3];

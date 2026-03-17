@@ -17,7 +17,7 @@ int main() {
     std::vector<RenderUnit> units = db.build(md, mat, "./Textures");
     Matrix44 tp{};
 
-    Renderer::draw_model(cv1, units, tp);
+    Renderer::draw_model(cv, units, tp);
 
 
     cv.save_ppm("output1.ppm");

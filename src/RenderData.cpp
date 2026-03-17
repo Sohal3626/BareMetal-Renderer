@@ -29,7 +29,12 @@ vector<RenderUnit> DataBuilder::build(Model &model, Material &mtl, const string 
 
     for (auto& [mtl_name, faces] : model.get_material_map()) {
         MaterialData tex = mtl.getMaterial(mtl_name);
-        string path = "../" + texture_dir + "/" + tex.map_kd;
+        string path;
+        if (tex.map_kd.empty()) {
+            path = "default";
+        }else {
+            path = "../" + texture_dir + "/" + tex.map_kd;
+        }
         ru.tex = make_shared<Texture>(path.c_str());
 
         for (const auto& tri : faces) {
