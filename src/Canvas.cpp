@@ -16,7 +16,8 @@ void Canvas::set_pixel(int x, int y, const Color &color, double z) {
     }
 }
 
-void Canvas::save_ppm(const std::string &filename) {
+void Canvas::save_ppm(const std::string &filename) const
+{
     std::ofstream file(filename);
     if (!file.is_open()) {
         cerr << "Unable to open file" << std::endl;

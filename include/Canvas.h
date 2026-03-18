@@ -18,9 +18,9 @@ public:
     Canvas(int w, int h) : width(w), height(h), pixels(w * h, {0, 0, 0}),
         zbuffer(w * h, -std::numeric_limits<double>::max()) { }
     void set_pixel(int x, int y, const Color& color, double z = 1e-9);
-    void save_ppm(const std::string& filename);
-    int getWidth() const { return width; }
-    int getHeight() const { return height; }
+    void save_ppm(const std::string& filename) const;
+    [[nodiscard]] int getWidth() const { return width; }
+    [[nodiscard]] int getHeight() const { return height; }
 };
 
 #endif //TOYENGINE_CANVAS_H

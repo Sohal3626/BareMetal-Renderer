@@ -14,7 +14,7 @@ public:
     int width, height, channels;
     unsigned char* data;
 
-    Texture(const char* filename) : width(0), height(0), channels(0), data(NULL) {
+    explicit Texture(const char* filename) : width(0), height(0), channels(0), data(NULL) {
         if (!filename || std::string(filename).empty()) {
             std::cerr << "Warning: Texture filename is empty!" << std::endl;
             return;
@@ -31,7 +31,7 @@ public:
         if (data) stbi_image_free(data);
     }
 
-    Color get_color(double u, double v) const {
+    [[nodiscard]] Color get_color(double u, double v) const {
         Color c;
         if (!data) {
             c = {1.0, 0.0, 1.0};

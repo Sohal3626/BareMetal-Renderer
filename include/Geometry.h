@@ -11,10 +11,10 @@
 template <int N>
 class Vec {
 private:
-    std::vector<double> data;
+    std::vector<double> data{};
 public:
     Vec() : data(N) {for ( int i=0; i<N; i++) data[i] = 0;}
-    Vec(std::vector<double> v) : data(std::move(v)) {};
+    explicit Vec(std::vector<double> v) : data(std::move(v)) {};
     Vec(std::initializer_list<double> v) : data(N) {
         auto it  = v.begin();
         for (int i=0; i<N && it != v.end(); ++i, ++it) data[i] = *it;
@@ -58,7 +58,7 @@ struct Matrix44 {
         return m[i * 4 + j];
     }
 
-    double idx(const int i, const int j) const {
+    [[nodiscard]] double idx(const int i, const int j) const {
         return m[i * 4 + j];
     }
 
@@ -91,7 +91,7 @@ struct Matrix44 {
 };
 
 
-static Vec<3> crossV3(Vec<3> &a, Vec<3> b) {
+static Vec<3> crossV3(Vec<3> &a, Vec<3> &b) {
     return {a[1] * b[2] - a[2] * b[1], -1 * (a[0] * b[2]) + a[2] * b[0], a[0] * b[1] - a[1] * b[0]};
 }
 

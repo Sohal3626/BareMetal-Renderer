@@ -11,8 +11,8 @@
 
 using namespace std;
 
-void Renderer::draw_line(Canvas& canvas, int x0, int y0, int x1, int y1, Color color) {
-    bool steep = abs(y1 - y0) > abs(x1 - x0);
+void Renderer::draw_line(Canvas& canvas, int x0, int y0, int x1, int y1, const Color& color) {
+    const bool steep = abs(y1 - y0) > abs(x1 - x0);
     if (steep) {
         swap(x0, y0);
         swap(x1, y1);
@@ -42,22 +42,23 @@ void Renderer::draw_line(Canvas& canvas, int x0, int y0, int x1, int y1, Color c
     }
 }
 
-void Renderer::draw_horizontal_line(Canvas& cv, int x1, int x2, int y, Color c1, Color c2) {
-    int width = x2 - x1;
+void Renderer::draw_horizontal_line(Canvas& cv, const int x1, const int x2, const int y,
+    const Color& c1, const Color& c2) {
+    const int width = x2 - x1;
     if (width <= 0) {
         cv.set_pixel(x1, y, c1);
         return;
     }
 
     for (int i = x1; i <= x2; i++) {
-        double t = (double)(i - x1) / width;
+        double t = static_cast<double>(i - x1) / width;
         Color tc = c1 + (c2 - c1) * t;
         cv.set_pixel(i, y, tc);
     }
 }
 
 void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
-        Texture& texture, double intensity, Vec<2>* uvs) {
+        const Texture& texture, double intensity, Vec<2>* uvs) {
     int minX = (int)floor(min({p0[0], p1[0], p2[0]}));
     int minY = (int)floor(min({p0[1], p1[1], p2[1]}));
     int maxX = (int)floor(max({p0[0], p1[0], p2[0]}));
@@ -71,13 +72,13 @@ void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
     Vec<3> p[3] = {p0, p1, p2};
     for (int x = minX; x <= maxX; x++) {
         for (int y = minY; y <= maxY; y++) {
-            Vec<3> bc = barycentric(p, {(double)x , (double)y});
+            Vec<3> bc = barycentric(p, {static_cast<double>(x) , static_cast<double>(y)});
 
             if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0 || isnan(bc[0]) || isnan(bc[1]) || isnan(bc[2])) continue;
-            double z = p0[2] * bc[0] + p1[2] * bc[1] + p2[2] * bc[2];
+            const double z = p0[2] * bc[0] + p1[2] * bc[1] + p2[2] * bc[2];
 
-            double u = uvs[0][0] * bc[0] + uvs[1][0] * bc[1] + uvs[2][0] * bc[2];
-            double v = uvs[0][1] * bc[0] + uvs[1][1] * bc[1] + uvs[2][1] * bc[2];
+            const double u = uvs[0][0] * bc[0] + uvs[1][0] * bc[1] + uvs[2][0] * bc[2];
+            const double v = uvs[0][1] * bc[0] + uvs[1][1] * bc[1] + uvs[2][1] * bc[2];
 
             Color color = texture.get_color(u, v);
             canvas.set_pixel(x, y, color*intensity, z);
@@ -85,7 +86,8 @@ void Renderer::fill_triangle(Canvas& canvas, Vec<3> p0, Vec<3> p1, Vec<3> p2,
     }
 }
 
-Matrix44 Renderer::transfrom(double p_scale, double angle_x, double angle_y, double angle_z, double camera_z) {
+Matrix44 Renderer::transfrom(const double p_scale,
+    const double angle_x, const double angle_y, const double angle_z, const double camera_z) {
     Matrix44 scale;
     scale.idx(0,0) = 1.0/p_scale; scale.idx(1,1) = 1.0/p_scale; scale.idx(2,2) = 1.0/p_scale;
 
@@ -113,17 +115,17 @@ Matrix44 Renderer::transfrom(double p_scale, double angle_x, double angle_y, dou
     return proj * rotationX * rotationY * rotationZ * scale;
 }
 
-double Renderer::get_intensity(Vec<3> *pts, Vec<3> light_dir) {
+double Renderer::get_intensity(const Vec<3> *pts, Vec<3> light_dir) {
     Vec<3> edge1 = pts[2] - pts[0];
     Vec<3> edge2 = pts[1] - pts[0];
     Vec<3> cEdge = crossV3(edge1, edge2);
-    double norm = sqrt(cEdge[0] * cEdge[0] + cEdge[1] * cEdge[1] + cEdge[2] * cEdge[2]);
-    if (norm > 0) cEdge = cEdge / norm;
+    if (const double norm = sqrt(cEdge[0] * cEdge[0] + cEdge[1] * cEdge[1] + cEdge[2] * cEdge[2]); norm > 0)
+        cEdge = cEdge / norm;
 
-    double light_norm =
+    const double light_norm =
         sqrt(light_dir[0] * light_dir[0] + light_dir[1] * light_dir[1] + light_dir[2] * light_dir[2]);
     light_dir = light_dir / light_norm;
-    double intensity = dotV3(cEdge, light_dir);
+    const double intensity = dotV3(cEdge, light_dir);
     if (intensity < 0) return 0;
     return intensity;
 }
@@ -150,11 +152,11 @@ void Renderer::draw_model(Canvas &canvas, const vector<RenderUnit>& units,
                 world[j] = {rv[0], rv[1], rv[2]};
                 Vec<3> pv = transform.perspective(rv);
 
-                double sx = (int)((pv[0] + 1.0) * 0.5 * (w - 1));
-                double sy = (int)((1.0 - (pv[1] + 1.0) * 0.5) * (h - 1));
+                double sx = static_cast<int>((pv[0] + 1.0) * 0.5 * (w - 1));
+                double sy = static_cast<int>((1.0 - (pv[1] + 1.0) * 0.5) * (h - 1));
                 screen[j] = {sx, sy, pv[2]};
             }
-            double intensity = get_intensity(world, light_dir);
+            const double intensity = get_intensity(world, light_dir);
             if (intensity <= 0) continue;
             fill_triangle(canvas, screen[0], screen[1], screen[2], *curr_tex ,intensity, uvs);
 

@@ -16,4 +16,6 @@ add_executable(toyEngine main.cpp
         include/Material.h
         include/RenderData.h
         src/RenderData.cpp
+        src/Model.cpp
+        src/Material.cpp
 )
