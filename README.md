@@ -6,6 +6,23 @@
 그냥 제미나이한테 공부하고 싶다 하면 로드맵을 알아서 찾아와서 나한테 강의까지 해준다.
 이 프로젝트의 목적은 렌더링의 기본적인 파이프라인을 공부하기 위해 AI의 도움을 받아 Tiny Renderer 스타일의 튜토리얼을 진행하는 것이다.
 
+## 예제
+```cpp
+int size_w = [YOUR CANVAS WIDTH];
+int size_h = [YOUR CANVAS HEIGHT];
+Canvas cv(size_w, size_h);
+
+Model md([YOUR OBJ PATH]);
+Material mat([YOUR MTL PATH]); // 주의 : .mtl 파일 내의 map_Kd 절의 내용이 파일명이 아닌 경로일 경우 파일명으로 바꿔주어야함
+DataBuilder db;
+std::vector<RenderUnit> units = db.build(md, mat, [YOUR TEXTURE DIRECTORY]); // 주의: 파일의 경로가 아닌 디렉토리의 경로여야함
+Matrix44 tp{};
+
+Renderer::draw_model(cv, units, tp);
+
+cv.save_ppm([YOUR PPM NAME]);
+```
+
 ## 파일 구조
 ```
 BareMetal-Render/
@@ -41,7 +58,7 @@ BareMetal-Render/
 - 모델 래스터라이징
 - 플랫 셰이딩
 - 단일 텍스쳐 매핑
-- mtl파싱을 통한 여러 텍스쳐 매핑
+- mtl 파싱을 통한 여러 텍스쳐 매핑
   
 ### 앞으로 할것들
  - 보간을 이용한 좀 더 개지리리는 셰이딩
