@@ -5,6 +5,7 @@
 #ifndef TOYENGINE_MTL_H
 #define TOYENGINE_MTL_H
 #include <map>
+#include <string>
 
 #include "Geometry.h"
 

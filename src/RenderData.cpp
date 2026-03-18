@@ -32,6 +32,7 @@ vector<RenderUnit> DataBuilder::build(Model &model, Material &mtl, const string 
         string path;
         if (tex.map_kd.empty()) {
             path = "default";
+            cerr << "Missing file -> " << tex.mtlname << endl;
         }else {
             path = "../" + texture_dir + "/" + tex.map_kd;
         }

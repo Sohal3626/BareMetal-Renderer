@@ -56,7 +56,7 @@ Material::Material(const char* filename){
                 map[curr_mtl].ke = ke;
             }else if (prefix == "ni") iss >> map[curr_mtl].ni;
             else if (prefix == "d") iss >> map[curr_mtl].d;
-            else if (prefix == "map_kd") iss >> map[curr_mtl].map_kd;
+            else if (prefix == "map_kd" || prefix == "map_Kd") iss >> map[curr_mtl].map_kd;
         }
     }
     mmap = map;

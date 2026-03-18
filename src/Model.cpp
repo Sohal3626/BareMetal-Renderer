@@ -4,6 +4,7 @@
 
 #include "../include/Model.h"
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -32,7 +33,7 @@ Model::Model(const char* filename)
             iss >> trash;
             std::string segment;
             while (iss >> segment) {
-                std::replace(segment.begin(), segment.end(), '/', ' ');
+                std::ranges::replace(segment, '/', ' ');
                 std::istringstream ss(segment);
 
                 if (int v = -1; ss >> v) {

@@ -136,14 +136,15 @@ void Renderer::draw_model(Canvas &canvas, const vector<RenderUnit>& units,
     int h = canvas.getHeight();
 
     for (const auto& unit : units) {
-        Texture* curr_tex = unit.tex.get();
+        const Texture* curr_tex = unit.tex.get();
+        if (!curr_tex) continue;
         for (size_t i = 0; i < unit.buffer.size(); i+=24) {
             Vec<3> screen[3];
             Vec<2> uvs[3];
             Vec<3> normal[3]; // vn을 이용한 플랫 쉐이딩은 나중에 구현
             Vec<3> world[3];
             for (int j=0; j<3; j++) {
-                int tmp = i + (j*8);
+                const int tmp = i + (j*8);
                 if (tmp + 7 >= unit.buffer.size()) break;
                 Vec<4> v4 = {unit.buffer[tmp], unit.buffer[tmp+1], unit.buffer[tmp+2], 1.};
                 uvs[j] = {unit.buffer[tmp+3], unit.buffer[tmp+4]};
@@ -158,8 +159,7 @@ void Renderer::draw_model(Canvas &canvas, const vector<RenderUnit>& units,
             }
             const double intensity = get_intensity(world, light_dir);
             if (intensity <= 0) continue;
-            fill_triangle(canvas, screen[0], screen[1], screen[2], *curr_tex ,intensity, uvs);
-
+                fill_triangle(canvas, screen[0], screen[1], screen[2], *curr_tex ,intensity, uvs);
         }
     }
 }

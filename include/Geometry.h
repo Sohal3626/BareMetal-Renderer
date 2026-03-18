@@ -85,7 +85,7 @@ struct Matrix44 {
 
     Vec<3> perspective(Vec<4>& v) const {
         Vec<4> res = (*this) * v;
-        if (std::abs(res[3]) > 1e-9) return { res[0]/res[3], res[1]/res[3], res[2]/res[3] };
+        if (abs(res[3]) > 1e-9) return { res[0]/res[3], res[1]/res[3], res[2]/res[3] };
         return {res[0], res[1], res[2]};
     }
 };
